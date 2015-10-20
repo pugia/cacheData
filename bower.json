@@ -1,0 +1,26 @@
+{
+  "name": "cacheData",
+  "main": "cacheData.min.js",
+  "version": "1.0.0",
+  "homepage": "https://github.com/pugia/cacheData",
+  "authors": [
+    "Marco Pugliese <marco.pugliese@pugia.com>"
+  ],
+  "description": "jQuery Plugin for single page caching data",
+  "keywords": [
+    "jquery",
+    "cache",
+    "ajax",
+    "get",
+    "post",
+    "caching"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
