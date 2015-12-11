@@ -13,15 +13,16 @@
 		return hash;
 	}
 	
-	$.cacheData = function(url, params, method) {
+	$.cacheData = function(url, params, method, headers) {
 		
 		var dfrd = $.Deferred();
 		
 		if (typeof url === 'undefined') { return dfrd.reject(); }
 		if (typeof method !== 'string') { method = 'get'; }
 		if (typeof params !== 'object') { params = {}; }	
+		if (typeof headers !== 'object') { headers = {}; }	
 		
-		var key = checksum(JSON.stringify([url,	method,params]));
+		var key = checksum(JSON.stringify([url,method,params,headers]));
 		
 		if (PACache[key]) { return PACache[key]; } 
 		else {
@@ -29,11 +30,14 @@
 			// init key element to prevent multiple calls on same url
 			PACache[key] = 1;
 			
-			$.ajax({
+			var conf = {
 			  method: method,
 			  url: url,
-			  data: params
-			})	
+			  data: params,
+			  headers: headers
+			};
+			
+			$.ajax(conf)	
 			.done(function(response) {
 				dfrd.resolve(response);
 			})

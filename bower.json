@@ -1,7 +1,7 @@
 {
   "name": "cacheData",
   "main": "cacheData.min.js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "homepage": "https://github.com/pugia/cacheData",
   "authors": [
     "Marco Pugliese <marco.pugliese@pugia.com>"
@@ -21,6 +21,11 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests"
-  ]
+    "tests",
+    "examples",
+    "config.codekit"
+  ],
+  "devDependencies": {
+    "jquery": "~1.11.3"
+  }
 }
