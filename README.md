@@ -11,7 +11,7 @@ jQuery Plugin for single page caching data
 ```
 
 ```
-$.cacheData(url, data)
+$.cacheData(url, data, params, headers)
   .done(function(response) {
     // do things
   })
