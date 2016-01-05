@@ -31,7 +31,7 @@
 			PACache[key] = 1;
 			
 			var conf = {
-			  method: method,
+			  type: method.toUpperCase(),
 			  url: url,
 			  data: params,
 			  headers: headers
