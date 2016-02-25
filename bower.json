@@ -1,7 +1,7 @@
 {
   "name": "cacheData",
   "main": "cacheData.min.js",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "homepage": "https://github.com/pugia/cacheData",
   "authors": [
     "Marco Pugliese <marco.pugliese@pugia.com>"
