@@ -30,16 +30,34 @@
 			// init key element to prevent multiple calls on same url
 			PACache[key] = 1;
 			
-			var conf = {
-			  type: method.toUpperCase(),
-			  url: url,
-			  data: params,
-			  headers: headers
-			};
+			url = url instanceof Array ? url : [url];
+			var ajaxs = [];
+			$.each(url, function(i,u) {
+
+				var conf = {
+				  type: method.toUpperCase(),
+				  url: u,
+				  data: params,
+				  headers: headers
+				};
+
+				ajaxs.push($.ajax(conf))
+				
+			})
 			
-			$.ajax(conf)	
-			.done(function(response) {
+			$.when.apply($, ajaxs)
+			.done(function() {
+				if (ajaxs.length > 1) {
+					var response = [];
+					$.each(arguments, function(i,a) {
+						response.push(a[0]);
+					})
+				} else {
+					var response = arguments[0];
+				}
+				
 				dfrd.resolve(response);
+				
 			})
 			.fail(function() {
 				PACache[key] = false;
