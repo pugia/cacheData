@@ -43,8 +43,8 @@
 			
 			$.ajax(conf)
 			.done(function(response) {
-				dfrd.resolve(response);
-				
+				var r = (typeof response == 'string') ? JSON.parse(response) || $.parseJSON(response) : response;
+				dfrd.resolve(r);
 			})
 			.fail(function() {
 				PACache[key] = false;
