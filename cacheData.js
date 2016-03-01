@@ -13,19 +13,30 @@
 		return hash;
 	}
 	
-	$.cacheData = function(url, params, method, headers) {
-		
+	$.cacheData = function(url, params, method, headers, contentType) {
+				
 		var dfrd = $.Deferred();
+		
+		if (url instanceof Array) {
+			return checkMultiple(url, params, method, headers, contentType);
+		}
+		
+		if (url instanceof Object) {						
+			if (typeof url.method === 'string') { method = url.method; }
+			if (typeof url.params !== 'undefined') { params = url.params; }
+			if (typeof url.headers !== 'undefined') { headers = url.headers; }
+			if (typeof url.contentType === 'string') { contentType = url.contentType; }
+			// prevent rewrite on other values
+			if (typeof url.url === 'string') { url = url.url; }
+		}		
+		
 		
 		if (typeof url === 'undefined') { return dfrd.reject(); }
 		if (typeof method !== 'string') { method = 'get'; }
-		if (typeof params !== 'object') { params = {}; }	
-		if (typeof headers !== 'object') { headers = {}; }	
-		
-		if (url instanceof Array) {
-			return checkMultiple(url, params, method, headers);
-		}
-		
+		if (typeof params === 'undefined') { params = {}; }	
+		if (typeof headers === 'undefined') { headers = {}; }	
+		if (typeof contentType !== 'string') { contentType = 'application/x-www-form-urlencoded; charset=UTF-8'; }	
+								
 		var key = checksum(JSON.stringify([url,method,params,headers]));
 		
 		if (PACache[key]) { return PACache[key]; } 
@@ -33,17 +44,17 @@
 			
 			// init key element to prevent multiple calls on same url
 			PACache[key] = 1;
-			
 			var conf = {
 			  type: method.toUpperCase(),
 			  url: url,
 			  data: params,
-			  headers: headers
+			  headers: headers,
+			  contentType: contentType
 			};
 			
 			$.ajax(conf)
 			.done(function(response) {
-				var r = (typeof response == 'string') ? JSON.parse(response) || $.parseJSON(response) : response;
+				var r = (typeof response === 'string') ? JSON.parse(response) || $.parseJSON(response) : response;
 				dfrd.resolve(r);
 			})
 			.fail(function() {
@@ -58,32 +69,29 @@
 			
 	};	
 	
-	function checkMultiple(urls, params, method, headers) {
+	function checkMultiple(urls, params, method, headers, contentType) {
 		
 		var dfrd = $.Deferred();
 		
 		urls = urls instanceof Array ? urls : [urls];
 		var ajaxs = [];
 		$.each(urls, function(i,u) {
-
-			ajaxs.push($.cacheData(u, params, method, headers))
 			
-		})
+			ajaxs.push($.cacheData(u, params, method, headers, contentType));
+			
+		});
 		
 		$.when.apply($, ajaxs)
 		.done(function() {
 						
 			if (ajaxs.length > 1) {
-				var response = arguments;
+				dfrd.resolve(arguments);
 			} else {
-				var response = arguments[0];
+				dfrd.resolve(arguments[0]);
 			}
-			
-			dfrd.resolve(response);
 			
 		})
 		.fail(function() {
-			PACache[key] = false;
 			dfrd.reject();
 		});
 				
