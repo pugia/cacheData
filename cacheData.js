@@ -49,7 +49,6 @@
 			  url: url,
 			  data: params,
 			  headers: headers,
-			  cache: false,
 			  async: false,
 			  contentType: contentType
 			};
