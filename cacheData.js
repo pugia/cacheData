@@ -1,6 +1,7 @@
 (function ($) {
 
 	var PACache = {};
+	var PAAjaxs = {};
 	
 	function checksum(s) {
 		var hash = 0,strlen = s.length,i,c;
@@ -17,12 +18,12 @@
 		
 		var conf = false;
 		
-		if (arguments.length == 2) {
+		if (arguments.length === 2) {
 			conf = $.extend(true, arguments[1], {
 				url: arguments[0]
 			});
 		}
-		if (arguments.length == 1) {
+		if (arguments.length === 1) {
 			conf = $.extend(true, arguments[0], null);
 		}
 		
@@ -37,17 +38,25 @@
 			// init key element to prevent multiple calls on same url
 			PACache[key] = 1;
 
-			$.ajax(conf)
-			.done(function(response) {
-				var r = (typeof response === 'string') ? JSON.parse(response) || $.parseJSON(response) : response;
-				dfrd.resolve(r);
-			})
-			.fail(function() {
-				PACache[key] = false;
-				dfrd.reject(arguments);
-			});
+			PAAjaxs[key] = $.ajax(conf)
+				.done(function(response) {
+					var r = (typeof response === 'string') ? JSON.parse(response) || $.parseJSON(response) : response;
+					delete PAAjaxs[key];
+					dfrd.resolve(r);
+				})
+				.fail(function() {
+					PACache[key] = false;
+					dfrd.reject(arguments);
+				});
 		
 			PACache[key] = dfrd.promise();
+			PACache[key].abort = function() {
+				if (PAAjaxs[key]) {
+					PAAjaxs[key].abort();
+					delete PAAjaxs[key];
+				}
+				dfrd.reject('abort');
+			};
 			return PACache[key];
 		}
 		
