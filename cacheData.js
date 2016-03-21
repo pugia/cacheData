@@ -13,6 +13,46 @@
 		return hash;
 	}
 	
+	$.cacheDataAjax = function() {
+		
+		var conf = false;
+		
+		if (arguments.length == 2) {
+			conf = $.extend(true, arguments[1], {
+				url: arguments[0]
+			});
+		}
+		if (arguments.length == 1) {
+			conf = $.extend(true, arguments[0], null);
+		}
+		
+		if (!conf) { return false; }
+		
+		var dfrd = $.Deferred();
+		
+		var key = checksum(JSON.stringify(conf));
+		if (PACache[key]) { return PACache[key]; } 
+		else {
+		
+			// init key element to prevent multiple calls on same url
+			PACache[key] = 1;
+
+			$.ajax(conf)
+			.done(function(response) {
+				var r = (typeof response === 'string') ? JSON.parse(response) || $.parseJSON(response) : response;
+				dfrd.resolve(r);
+			})
+			.fail(function() {
+				PACache[key] = false;
+				dfrd.reject(arguments);
+			});
+		
+			PACache[key] = dfrd.promise();
+			return PACache[key];
+		}
+		
+	};
+	
 	$.cacheData = function(url, params, method, headers, contentType) {
 				
 		var dfrd = $.Deferred();
@@ -31,7 +71,7 @@
 		}		
 		
 		
-		if (typeof url === 'undefined') { return dfrd.reject(); }
+		if (typeof url === 'undefined') { dfrd.reject(); return dfrd.promise(); }
 		if (typeof method !== 'string') { method = 'get'; }
 		if (typeof params === 'undefined') { params = {}; }	
 		if (typeof headers === 'undefined') { headers = {}; }	
@@ -53,7 +93,7 @@
 			  contentType: contentType
 			};
 			
-			$.ajax(conf)
+			$.cacheDataAjax(conf)
 			.done(function(response) {
 				var r = (typeof response === 'string') ? JSON.parse(response) || $.parseJSON(response) : response;
 				dfrd.resolve(r);
