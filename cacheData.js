@@ -62,19 +62,18 @@
 		
 	};
 	
-	$.cacheData = function(url, params, method, headers, contentType) {
+	$.cacheData = function(url, params, method, async) {
 				
 		var dfrd = $.Deferred();
 		
 		if (url instanceof Array) {
-			return checkMultiple(url, params, method, headers, contentType);
+			return checkMultiple(url, params, method, async);
 		}
 		
 		if (url instanceof Object) {						
 			if (typeof url.method === 'string') { method = url.method; }
 			if (typeof url.params !== 'undefined') { params = url.params; }
-			if (typeof url.headers !== 'undefined') { headers = url.headers; }
-			if (typeof url.contentType === 'string') { contentType = url.contentType; }
+			if (typeof url.async !== 'undefined') { async = url.async; }
 			// prevent rewrite on other values
 			if (typeof url.url === 'string') { url = url.url; }
 		}		
@@ -83,10 +82,9 @@
 		if (typeof url === 'undefined') { dfrd.reject(); return dfrd.promise(); }
 		if (typeof method !== 'string') { method = 'get'; }
 		if (typeof params === 'undefined') { params = {}; }	
-		if (typeof headers === 'undefined') { headers = {}; }	
-		if (typeof contentType !== 'string') { contentType = 'application/x-www-form-urlencoded; charset=UTF-8'; }	
+		if (typeof async === 'undefined') { async = true; }	
 								
-		var key = checksum(JSON.stringify([url,method,params,headers]));
+		var key = checksum(JSON.stringify([url,method,params]));
 		
 		if (PACache[key]) { return PACache[key]; } 
 		else {
@@ -97,9 +95,7 @@
 			  type: method.toUpperCase(),
 			  url: url,
 			  data: params,
-			  headers: headers,
-			  async: true,
-			  contentType: contentType
+			  async: async
 			};
 			
 			$.cacheDataAjax(conf)
@@ -119,7 +115,7 @@
 			
 	};	
 	
-	function checkMultiple(urls, params, method, headers, contentType) {
+	function checkMultiple(urls, params, method, async) {
 		
 		var dfrd = $.Deferred();
 		
@@ -127,7 +123,7 @@
 		var ajaxs = [];
 		$.each(urls, function(i,u) {
 			
-			ajaxs.push($.cacheData(u, params, method, headers, contentType));
+			ajaxs.push($.cacheData(u, params, method, async));
 			
 		});
 		
@@ -148,5 +144,5 @@
 		return dfrd.promise();
 		
 	}
-
+	
 }(jQuery));
