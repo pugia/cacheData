@@ -98,7 +98,7 @@
 			  url: url,
 			  data: params,
 			  headers: headers,
-			  async: false,
+			  async: true,
 			  contentType: contentType
 			};
 			
