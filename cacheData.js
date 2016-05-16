@@ -40,9 +40,8 @@
 
 			PAAjaxs[key] = $.ajax(conf)
 				.done(function(response) {
-					var r = (typeof response === 'string') ? JSON.parse(response) || $.parseJSON(response) : response;
 					delete PAAjaxs[key];
-					dfrd.resolve(r);
+					dfrd.resolve(response);
 				})
 				.fail(function() {
 					PACache[key] = false;
@@ -100,8 +99,7 @@
 			
 			$.cacheDataAjax(conf)
 			.done(function(response) {
-				var r = (typeof response === 'string') ? JSON.parse(response) || $.parseJSON(response) : response;
-				dfrd.resolve(r);
+				dfrd.resolve(response);
 			})
 			.fail(function() {
 				PACache[key] = false;
